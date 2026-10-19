@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">إدارة الإسناد الطبي</string>
+    <string name="default_web_client_id" translatable="false">165401632749-3jm4ifrsca3gsplr8jn6jh3gq0b03d9t.apps.googleusercontent.com</string>
 </resources>

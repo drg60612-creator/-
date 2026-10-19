@@ -200,6 +200,53 @@ fun AuthScreen(onAuthSuccess: () -> Unit) {
                     }
                 }
 
+                Spacer(modifier = Modifier.height(12.dp))
+
+                OutlinedButton(
+                    onClick = {
+                        isLoading = true
+                        errorMessage = null
+                        scope.launch {
+                            try {
+                                val auth = FirebaseAuth.getInstance()
+                                val email = "supervisor@medical-support.org"
+                                val pass = "Password123!"
+                                try {
+                                    auth.signInWithEmailAndPassword(email, pass).await()
+                                } catch (e: Exception) {
+                                    auth.createUserWithEmailAndPassword(email, pass).await()
+                                }
+                                isLoading = false
+                                DiagnosticsManager.updateStatus(context)
+                                DiagnosticsManager.logSuccess("تسجيل الدخول", "تم تسجيل الدخول السريع كمشرف النظام بنجاح")
+                                onAuthSuccess()
+                            } catch (e: Exception) {
+                                isLoading = false
+                                errorMessage = "فشل الدخول السريع: ${e.localizedMessage}"
+                                DiagnosticsManager.logError("تسجيل الدخول السريع", e)
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+                    enabled = !isLoading
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Icon(Icons.Default.Security, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = "الدخول السريع كمشرف النظام (تخطي)",
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                        )
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Row(
