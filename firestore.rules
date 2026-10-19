@@ -1,0 +1,102 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidMember(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.userId is string && data.userId.size() > 0 &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+             data.role is string && (data.role == "مناوب" || data.role == "مشرف" || data.role == "on_call" || data.role == "supervisor") &&
+             data.defaultShiftDay is string && data.defaultShiftDay.size() <= 50 &&
+             data.badge is string && (data.badge == "بيضاء" || data.badge == "حمراء" || data.badge == "بدون علامة" || data.badge == "white" || data.badge == "red" || data.badge == "none") &&
+             data.supervisorName is string && data.supervisorName.size() <= 100 &&
+             data.archived is bool &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             (!('updatedAt' in data) || data.updatedAt == null || (data.updatedAt is timestamp && data.updatedAt <= request.time));
+    }
+
+    function isValidShift(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.userId is string && data.userId.size() > 0 &&
+             data.memberId is string && data.memberId.size() <= 128 &&
+             data.memberName is string && data.memberName.size() <= 100 &&
+             data.defaultShiftDay is string && data.defaultShiftDay.size() <= 50 &&
+             data.actualShiftDay is string && data.actualShiftDay.size() <= 50 &&
+             data.date is string && data.date.size() <= 50 &&
+             data.period is string && data.period.size() <= 50 &&
+             data.serviceLocation is string && data.serviceLocation.size() <= 100 &&
+             data.status is string && (data.status == "حاضر" || data.status == "غائب" || data.status == "تغطية" || data.status == "مستأذن") &&
+             data.manualOverride is bool &&
+             data.approved is bool &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             (!('updatedAt' in data) || data.updatedAt == null || (data.updatedAt is timestamp && data.updatedAt <= request.time));
+    }
+
+    function isValidDayApproval(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.userId is string && data.userId.size() > 0 &&
+             data.date is string && data.date.size() <= 50 &&
+             data.approved is bool &&
+             data.approvedBy is string && data.approvedBy.size() <= 100 &&
+             (!('updatedAt' in data) || data.updatedAt == null || (data.updatedAt is timestamp && data.updatedAt <= request.time));
+    }
+
+    function isValidAuditLog(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.userId is string && data.userId.size() > 0 &&
+             data.action is string && data.action.size() <= 100 &&
+             data.details is string && data.details.size() <= 500 &&
+             data.timestamp is timestamp && data.timestamp <= request.time;
+    }
+
+    // Shared Team Workspace (Accessible to all authenticated supervisors/members)
+    match /team/{teamId} {
+      allow get: if isSignedIn();
+    }
+
+    match /team/medical_support/members/{memberId} {
+      allow get, list, create, update: if isSignedIn();
+      allow delete: if isSignedIn();
+    }
+
+    match /team/medical_support/shifts/{shiftId} {
+      allow get, list, create, update, delete: if isSignedIn();
+    }
+
+    match /team/medical_support/dayApprovals/{dateId} {
+      allow get, list, create, update, delete: if isSignedIn();
+    }
+
+    match /team/medical_support/serviceLocations/{locationId} {
+      allow get, list, create, update, delete: if isSignedIn();
+    }
+
+    match /team/medical_support/periods/{periodId} {
+      allow get, list, create, update, delete: if isSignedIn();
+    }
+
+    match /team/medical_support/auditLogs/{logId} {
+      allow get, list, create: if isSignedIn();
+      allow update, delete: if false;
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "إدارة الإسناد الطبي",
+  "description": "تطبيق إدارة فريق الإسناد الطبي لطلاب كلية الطب في هيئة مستشفى مأرب العام",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

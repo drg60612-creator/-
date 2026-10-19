@@ -1,0 +1,91 @@
+{
+  "entities": {
+    "Member": {
+      "title": "Member",
+      "description": "Medical support team member / volunteer",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Document ID" },
+        "userId": { "type": "string", "description": "Creator or last modifier user ID" },
+        "name": { "type": "string", "description": "Volunteer name" },
+        "role": { "type": "string", "description": "Role: مناوب or مشرف" },
+        "defaultShiftDay": { "type": "string", "description": "Default shift day" },
+        "badge": { "type": "string", "description": "Badge: بيضاء, حمراء, or بدون علامة" },
+        "supervisorName": { "type": "string", "description": "Supervisor name" },
+        "archived": { "type": "boolean", "description": "Archive status" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Update timestamp" }
+      },
+      "required": ["id", "userId", "name", "role", "defaultShiftDay", "badge", "supervisorName", "archived", "createdAt"]
+    },
+    "Shift": {
+      "title": "Shift",
+      "description": "Shift attendance and coverage record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Shift ID" },
+        "userId": { "type": "string", "description": "Creator user ID" },
+        "memberId": { "type": "string", "description": "Member ID" },
+        "memberName": { "type": "string", "description": "Member Name" },
+        "defaultShiftDay": { "type": "string", "description": "Default shift day" },
+        "actualShiftDay": { "type": "string", "description": "Actual shift day" },
+        "date": { "type": "string", "description": "Shift date" },
+        "period": { "type": "string", "description": "Shift period: صباحية، مسائية، ليلية" },
+        "serviceLocation": { "type": "string", "description": "Service location" },
+        "status": { "type": "string", "description": "Status: حاضر، غائب، تغطية، مستأذن" },
+        "manualOverride": { "type": "boolean", "description": "Manual override flag" },
+        "overrideReason": { "type": "string", "description": "Reason for override" },
+        "modifiedBy": { "type": "string", "description": "Supervisor email/ID who modified" },
+        "approved": { "type": "boolean", "description": "Approval status" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Update timestamp" }
+      },
+      "required": ["id", "userId", "memberId", "memberName", "defaultShiftDay", "actualShiftDay", "date", "period", "serviceLocation", "status", "manualOverride"]
+    },
+    "DayApproval": {
+      "title": "DayApproval",
+      "description": "Day completion and approval record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Date ID" },
+        "userId": { "type": "string", "description": "User ID" },
+        "date": { "type": "string", "description": "Date string" },
+        "approved": { "type": "boolean", "description": "Approved flag" },
+        "approvedBy": { "type": "string", "description": "Approver username/email" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Update timestamp" }
+      },
+      "required": ["id", "userId", "date", "approved"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "System operation audit log",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Log ID" },
+        "userId": { "type": "string", "description": "User ID who performed action" },
+        "action": { "type": "string", "description": "Action type" },
+        "details": { "type": "string", "description": "Action details" },
+        "timestamp": { "type": "string", "format": "date-time", "description": "Action timestamp" }
+      },
+      "required": ["id", "userId", "action", "details", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/team/medical_support/members/{memberId}": {
+      "schema": { "$ref": "#/entities/Member" },
+      "description": "Shared team members collection"
+    },
+    "/team/medical_support/shifts/{shiftId}": {
+      "schema": { "$ref": "#/entities/Shift" },
+      "description": "Shared team shifts collection"
+    },
+    "/team/medical_support/dayApprovals/{dateId}": {
+      "schema": { "$ref": "#/entities/DayApproval" },
+      "description": "Shared team day approvals collection"
+    },
+    "/team/medical_support/auditLogs/{logId}": {
+      "schema": { "$ref": "#/entities/AuditLog" },
+      "description": "Shared team audit logs collection"
+    }
+  }
+}
